@@ -9,6 +9,7 @@
 namespace Search\Collection\Feed;
 
 use Search\Collection\SearchCollectionAbstract;
+use Search\Collection\SearchCollectionQueue;
 
 /**
  * A search collection for RSS / Atom feeds.
@@ -30,7 +31,7 @@ class FeedCollection extends SearchCollectionAbstract
      */
     public function init()
     {
-        $this->_feed = new SimplePie();
+        $this->_feed = new \SimplePie();
         if ($url = $this->getOption('url')) {
             $this->_feed->set_feed_url($url);
         }
@@ -38,12 +39,13 @@ class FeedCollection extends SearchCollectionAbstract
 
     /**
      * Implements Search::Collection::SearchCollectionAbstract::getQueue().
+     *
+     * @todo Better error handling for $items = 0;
      */
     public function getQueue($limit = self::NO_LIMIT)
     {
         $this->_feed->init();
         $items = (array) $this->_feed->get_items();
-        // @todo Better error handling for $items = 0;
         return new SearchCollectionQueue($items);
     }
 
