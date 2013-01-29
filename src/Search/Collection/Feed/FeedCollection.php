@@ -40,9 +40,9 @@ class FeedCollection extends SearchCollectionAbstract
     /**
      * Implements Search::Collection::SearchCollectionAbstract::getQueue().
      *
-     * @todo Better error handling for $items = 0;
+     * @todo Better error handling for null === $items;
      */
-    public function getQueue($limit = self::NO_LIMIT)
+    public function getQueue($limit = SearchCollectionQueue::NO_LIMIT)
     {
         $this->_feed->init();
         $items = (array) $this->_feed->get_items();
