@@ -82,8 +82,22 @@ class FeedCollection extends SearchCollectionAbstract
      */
     public function buildDocument(SearchIndexDocument $document, $data)
     {
-        $document->id = $data->get_id();
+        $document->source = $this->_feed->get_title();
+        $document->subject = $this->_feed->get_description();
+
         $document->title = $data->get_title();
-        $document->authors = $data->get_authors();
+        $document->link = $data->get_link();
+        $document->description = $data->get_description();
+        $document->creator = (array) $data->get_author();
+        $document->date = $data->get_date();
+
+        // PHP properties cannot have dashes (-), and the fields below have
+        // dashes in the field name.
+
+        $document->source_link = $this->_feed->get_link();
+        $document->getField('source_link')->setName('source-link');
+
+        $document->item_subject = $this->_feed->get_link();
+        $document->getField('item_subject')->setName('item-subject');
     }
 }
