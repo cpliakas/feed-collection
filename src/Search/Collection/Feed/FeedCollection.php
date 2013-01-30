@@ -10,6 +10,7 @@ namespace Search\Collection\Feed;
 
 use Search\Collection\SearchCollectionAbstract;
 use Search\Collection\SearchCollectionQueue;
+use Search\Index\SearchIndexDocument;
 
 /**
  * A search collection for RSS / Atom feeds.
@@ -71,5 +72,18 @@ class FeedCollection extends SearchCollectionAbstract
     {
         $this->_feed->set_feed_url($url);
         return $this;
+    }
+
+    /**
+     * Implements Search::Collection::SearchCollectionAbstract::buildDocument().
+     *
+     * @param SearchIndexDocument $document
+     * @param \SimplePie_Item $data
+     */
+    public function buildDocument(SearchIndexDocument $document, $data)
+    {
+        $document->id = $data->get_id();
+        $document->title = $data->get_title();
+        $document->authors = $data->get_authors();
     }
 }
