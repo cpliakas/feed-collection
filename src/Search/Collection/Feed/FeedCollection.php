@@ -8,9 +8,9 @@
 
 namespace Search\Collection\Feed;
 
-use Search\Collection\SearchCollectionAbstract;
-use Search\Collection\SearchCollectionQueue;
-use Search\Index\SearchIndexDocument;
+use Search\Framework\SearchCollectionAbstract;
+use Search\Framework\SearchCollectionQueue;
+use Search\Framework\SearchIndexDocument;
 
 /**
  * A search collection for RSS / Atom feeds.

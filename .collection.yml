@@ -1,0 +1,16 @@
+name: Feed Collection
+description: Integrates with the SimplePie library to provide collections of RSS and ATOM feeds.
+fields:
+- source: {
+    unique: true
+  }
+- source-link:
+- subject:
+- title:
+- link:
+- description:
+- creator:
+- date:
+- all_text: {
+    default_search_field: true
+  }
