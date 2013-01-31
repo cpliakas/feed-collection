@@ -18,6 +18,13 @@ use Search\Framework\SearchIndexDocument;
 class FeedCollection extends SearchCollectionAbstract
 {
     /**
+     * This collection indexes data from RSS / Atom feeds.
+     *
+     * @var string
+     */
+    protected $_type = 'feed';
+
+    /**
      * The feed being parsed.
      *
      * @var \SimplePie
