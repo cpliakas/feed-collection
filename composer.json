@@ -1,7 +1,7 @@
 {
     "name": "cpliakas/feed-collection",
     "type": "library",
-    "description": "Provides an RSS / Atom feed collection for the search framework library.",
+    "description": "Provides an RSS / Atom feed collection to the search framework library.",
     "keywords": ["search", "search-framework", "atom", "rss", "feed"],
     "homepage": "https://github.com/cpliakas/feed-collection",
     "license": "LGPL-3.0",

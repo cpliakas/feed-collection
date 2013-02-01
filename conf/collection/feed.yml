@@ -1,0 +1,63 @@
+feed:
+
+  label:        Feed Collection
+  description:  Integrates with the SimplePie library to provide collections of RSS and ATOM feeds.
+
+  schema:
+
+    fields:
+
+      source:
+        label:        Channel title
+        description:  Defines the title of the channel (e.g. W3Schools Home Page)
+        stored:       true
+
+      source_link:
+        name:         source-link
+        label:        Channel link
+        description:  Defines the hyperlink to the channel (e.g. http://www.w3schools.com)
+        index:        false
+        store:        true
+
+      subject:
+        label:        Channel subject
+        description:  Describes the channel (e.g. Free web building tutorials)
+        store:        true
+
+      title:
+        label:        Title
+        description:  Defines the title of the item.
+        store:        true
+
+      link:
+        label:        Link
+        description:  Defines the hyperlink to the item.
+        store:        true
+        unique:       true
+
+      description:
+        label:        Description
+        description:  Describes the item.
+        store:        true
+
+      creator:
+        label:        Creator
+        description:  The author of the item.
+        store:        true
+        index:        false
+        
+      date:
+        label:        Publication date
+        description:  Defines the last-publication date for the item
+
+    unique_field: link
+
+    all_field:
+      id: all_text
+      fields:
+        - source
+        - subject
+        - title
+        - description
+        - creator
+        - item_subject
