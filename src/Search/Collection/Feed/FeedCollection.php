@@ -17,12 +17,15 @@ use Search\Framework\SearchIndexDocument;
  */
 class FeedCollection extends SearchCollectionAbstract
 {
+
+    protected static $_id = 'feed';
+
     /**
      * This collection indexes data from RSS / Atom feeds.
      *
      * @var string
      */
-    protected $_type = 'feed';
+    protected $_type = 'feeds';
 
     /**
      * The feed being parsed.
