@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Feed Collection
+ * Feed collection for the Search Framework library.
  *
  * @license http://www.gnu.org/licenses/lgpl-3.0.txt
  */
