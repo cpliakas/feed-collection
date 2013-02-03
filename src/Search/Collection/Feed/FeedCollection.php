@@ -9,6 +9,7 @@
 namespace Search\Collection\Feed;
 
 use Search\Framework\SearchCollectionAbstract;
+use Search\Framework\SearchCollectionQueue;
 use Search\Framework\SearchIndexDocument;
 use Search\Framework\SearchIndexer;
 
