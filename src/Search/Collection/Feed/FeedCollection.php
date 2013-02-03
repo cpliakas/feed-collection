@@ -9,8 +9,8 @@
 namespace Search\Collection\Feed;
 
 use Search\Framework\SearchCollectionAbstract;
-use Search\Framework\SearchCollectionQueue;
 use Search\Framework\SearchIndexDocument;
+use Search\Framework\SearchIndexer;
 
 /**
  * A search collection for RSS / Atom feeds.
@@ -53,7 +53,7 @@ class FeedCollection extends SearchCollectionAbstract
      *
      * @todo Better error handling for null === $items;
      */
-    public function getQueue($limit = SearchCollectionQueue::NO_LIMIT)
+    public function getQueue($limit = SearchIndexer::NO_LIMIT)
     {
         $this->_feed->init();
         $items = (array) $this->_feed->get_items();
