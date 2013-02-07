@@ -9,9 +9,8 @@
 namespace Search\Collection\Feed;
 
 use Search\Framework\SearchCollectionAbstract;
-use Search\Framework\SearchCollectionQueue;
+use Search\Framework\SearchQueueMessage;
 use Search\Framework\SearchIndexDocument;
-use Search\Framework\SearchIndexer;
 
 /**
  * A search collection for RSS / Atom feeds.
@@ -21,12 +20,11 @@ class FeedCollection extends SearchCollectionAbstract
 
     protected static $_id = 'feed';
 
-    /**
-     * This collection indexes data from RSS / Atom feeds.
-     *
-     * @var string
-     */
     protected $_type = 'feeds';
+
+    protected static $_defaultLimit = 50;
+
+    protected static $_defaultTimeout = 30;
 
     /**
      * The feed being parsed.
@@ -36,7 +34,14 @@ class FeedCollection extends SearchCollectionAbstract
     protected $_feed;
 
     /**
-     * Implements Search::Collection::SearchCollectionAbstract::init().
+     * The consumed feed items keyed by its unique identifier.
+     *
+     * @var array
+     */
+    protected $_scheduledItems;
+
+    /**
+     * Implements SearchCollectionAbstract::init().
      *
      * Instantiates a SimplePie object, sets the feed URL if the "url" option
      * was passed via the constructor.
@@ -50,15 +55,52 @@ class FeedCollection extends SearchCollectionAbstract
     }
 
     /**
-     * Implements Search::Collection::SearchCollectionAbstract::getQueue().
+     * Fetches the specified number of feed items from the resource.
      *
-     * @todo Better error handling for null === $items;
+     * This is a wrapper around \SimplePie::get_items(), except that it also
+     * keys the array by each feed's unique identifier. This method can also be
+     * used to warm the cache in parallel indexing configurations.
+     *
+     * @param int $limit
+     *   The maximum number of feeds to process, defaults to no limit which will
+     *   pull whatever the resource has published.
+     *
+     * @return array
+     *   An array of \SimplePie_Item objects keyed by the feed item's unique
+     *   identifier.
      */
-    public function getQueue($limit = SearchIndexer::NO_LIMIT)
+    public function fetchFeedItems($limit = self::NO_LIMIT)
     {
+        $end = ($limit != self::NO_LIMIT) ? $limit : 0;
+
+        // Get the array of feed items.
         $this->_feed->init();
-        $items = (array) $this->_feed->get_items();
-        return new SearchCollectionQueue($items);
+        $items = $this->_feed->get_items(0, $end);
+        if (null === $items) {
+            // @todo Log the error?
+            $items = array();
+        }
+
+        // Key the array by the feed's unique ID.
+        foreach ($items as $item) {
+            $item_id = $item->get_id();
+            $items[$item_id] = $item;
+            // @todo Should we unset the original key?
+        }
+
+        return $items;
+    }
+
+    /**
+     * Implements SearchCollectionAbstract::fetchScheduledItems().
+     *
+     * This method simply fetches whatever is published by the resource.
+     */
+    public function fetchScheduledItems()
+    {
+        $limit = $this->getLimit();
+        $this->_scheduledItems = $this->fetchFeedItems($limit);
+        return new \ArrayIterator($this->_scheduledItems);
     }
 
     /**
@@ -86,7 +128,34 @@ class FeedCollection extends SearchCollectionAbstract
     }
 
     /**
-     * Implements Search::Collection::SearchCollectionAbstract::buildDocument().
+     * Implements SearchCollectionAbstract::buildQueueMessage().
+     *
+     * @param SearchQueueMessage $message
+     * @param \SimplePie_Item $item
+     */
+    public function buildQueueMessage(SearchQueueMessage $message, $item)
+    {
+        $item_id = $item->get_id();
+        $message->setBody($item_id);
+    }
+
+    /**
+     * Implements SearchCollectionAbstract::loadSourceData().
+     */
+    public function loadSourceData(SearchQueueMessage $message)
+    {
+        $item_id = $message->getBody();
+        if (isset($this->_scheduledItems[$item_id])) {
+            return $this->_scheduledItems[$item_id];
+        }
+
+        // @todo Handle the error. This is only an issue in parallel indexing
+        // configurations.
+        return false;
+    }
+
+    /**
+     * Implements SearchCollectionAbstract::buildDocument().
      *
      * @param SearchIndexDocument $document
      * @param \SimplePie_Item $data
