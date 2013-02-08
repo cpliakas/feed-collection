@@ -38,6 +38,12 @@ schema:
       description:  Describes the item.
       store:        true
 
+    item_subject:
+      name:         item-subject
+      label:        Subject
+      description:  Describes the item.
+      store:        true
+
     creator:
       label:        Creator
       description:  The author of the item.

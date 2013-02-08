@@ -169,7 +169,7 @@ class FeedCollection extends SearchCollectionAbstract
         $document->link = $data->get_link();
         $document->description = $data->get_description();
         $document->creator = (array) $data->get_author();
-        $document->date = $data->get_date('Y-m-d\TH:i:s\Z');
+        $document->date = $data->get_date();
 
         // PHP properties cannot have dashes (-), and the fields below have
         // dashes in the field name.
