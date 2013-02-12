@@ -18,9 +18,9 @@ use Search\Framework\SearchIndexDocument;
 class FeedCollection extends SearchCollectionAbstract
 {
 
-    protected static $_id = 'feed';
-
     protected $_type = 'feeds';
+
+    protected static $_configBasename = 'feed';
 
     protected static $_defaultLimit = 50;
 

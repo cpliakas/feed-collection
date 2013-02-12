@@ -1,5 +1,5 @@
-label:        Feed Collection
-description:  Integrates with the SimplePie library to provide collections of RSS and ATOM feeds.
+label:        RSS / Atom Feed Collection
+description:  Integrates with the SimplePie library to provide a collection of RSS and ATOM feeds.
 
 schema:
 
