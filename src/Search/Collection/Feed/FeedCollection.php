@@ -8,23 +8,20 @@
 
 namespace Search\Collection\Feed;
 
-use Search\Framework\SearchCollectionAbstract;
-use Search\Framework\SearchQueueMessage;
-use Search\Framework\SearchIndexDocument;
+use Search\Framework\CollectionAbstract;
+use Search\Framework\CollectionAgentAbstract;
+use Search\Framework\IndexDocument;
+use Search\Framework\QueueMessage;
 
 /**
  * A search collection for RSS / Atom feeds.
  */
-class FeedCollection extends SearchCollectionAbstract
+class FeedCollection extends CollectionAbstract
 {
 
     protected $_type = 'feeds';
 
     protected static $_configBasename = 'feed';
-
-    protected static $_defaultLimit = 50;
-
-    protected static $_defaultTimeout = 30;
 
     /**
      * The feed being parsed.
@@ -41,16 +38,16 @@ class FeedCollection extends SearchCollectionAbstract
     protected $_scheduledItems;
 
     /**
-     * Implements SearchCollectionAbstract::init().
+     * Implements CollectionAbstract::init().
      *
      * Instantiates a SimplePie object, sets the feed URL if the "url" option
      * was passed via the constructor.
      */
-    public function init()
+    public function init(array $options)
     {
         $this->_feed = new \SimplePie();
-        if ($url = $this->getOption('url')) {
-            $this->_feed->set_feed_url($url);
+        if (isset($options['url'])) {
+            $this->_feed->set_feed_url($options['url']);
         }
     }
 
@@ -69,9 +66,9 @@ class FeedCollection extends SearchCollectionAbstract
      *   An array of \SimplePie_Item objects keyed by the feed item's unique
      *   identifier.
      */
-    public function fetchFeedItems($limit = self::NO_LIMIT)
+    public function fetchFeedItems($limit = CollectionAgentAbstract::NO_LIMIT)
     {
-        $end = ($limit != self::NO_LIMIT) ? $limit : 0;
+        $end = ($limit != CollectionAgentAbstract::NO_LIMIT) ? $limit : 0;
 
         // Get the array of feed items.
         $this->_feed->init();
@@ -82,23 +79,22 @@ class FeedCollection extends SearchCollectionAbstract
         }
 
         // Key the array by the feed's unique ID.
-        foreach ($items as $item) {
+        foreach ($items as $key => $item) {
             $item_id = $item->get_id();
             $items[$item_id] = $item;
-            // @todo Should we unset the original key?
+            unset($items[$key]);
         }
 
         return $items;
     }
 
     /**
-     * Implements SearchCollectionAbstract::fetchScheduledItems().
+     * Implements CollectionAbstract::fetchScheduledItems().
      *
      * This method simply fetches whatever is published by the resource.
      */
-    public function fetchScheduledItems()
+    public function fetchScheduledItems($limit = CollectionAgentAbstract::NO_LIMIT)
     {
-        $limit = $this->getLimit();
         $this->_scheduledItems = $this->fetchFeedItems($limit);
         return new \ArrayIterator($this->_scheduledItems);
     }
@@ -128,21 +124,21 @@ class FeedCollection extends SearchCollectionAbstract
     }
 
     /**
-     * Implements SearchCollectionAbstract::buildQueueMessage().
+     * Implements CollectionAbstract::buildQueueMessage().
      *
-     * @param SearchQueueMessage $message
+     * @param QueueMessage $message
      * @param \SimplePie_Item $item
      */
-    public function buildQueueMessage(SearchQueueMessage $message, $item)
+    public function buildQueueMessage(QueueMessage $message, $item)
     {
         $item_id = $item->get_id();
         $message->setBody($item_id);
     }
 
     /**
-     * Implements SearchCollectionAbstract::loadSourceData().
+     * Implements CollectionAbstract::loadSourceData().
      */
-    public function loadSourceData(SearchQueueMessage $message)
+    public function loadSourceData(QueueMessage $message)
     {
         $item_id = $message->getBody();
         if (isset($this->_scheduledItems[$item_id])) {
@@ -155,12 +151,12 @@ class FeedCollection extends SearchCollectionAbstract
     }
 
     /**
-     * Implements SearchCollectionAbstract::buildDocument().
+     * Implements CollectionAbstract::buildDocument().
      *
-     * @param SearchIndexDocument $document
+     * @param IndexDocument $document
      * @param \SimplePie_Item $data
      */
-    public function buildDocument(SearchIndexDocument $document, $data)
+    public function buildDocument(IndexDocument $document, $data)
     {
         $document->source = $this->_feed->get_title();
         $document->subject = $this->_feed->get_description();
